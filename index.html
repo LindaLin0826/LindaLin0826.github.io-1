@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快樂學習遊戲</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 主選單 */
+        #main-menu {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        #main-menu h1 {
+            color: white;
+            font-size: 3rem;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .menu-btn {
+            padding: 30px 20px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+
+        .menu-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+        }
+
+        .menu-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .btn-game1 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .btn-game2 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .btn-game3 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .btn-game4 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+
+        /* 返回按鈕 */
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.05);
+            background: white;
+        }
+
+        /* 遊戲頁面 */
+        .game-page {
+            display: none;
+            padding: 80px 20px 40px;
+            text-align: center;
+        }
+
+        .game-page.active {
+            display: block;
+        }
+
+        .game-page h2 {
+            color: white;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* 遊戲1：顏色學習 */
+        .color-game {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .color-item {
+            width: 150px;
+            height: 150px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .color-item:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .color-item .emoji {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        /* 遊戲2：數字學習 */
+        .number-game {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .number-item {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+
+        .number-item:hover {
+            transform: scale(1.15);
+            background: #667eea;
+            color: white;
+        }
+
+        /* 遊戲3：形狀學習 */
+        .shape-game {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .shape-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .shape-item:hover {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        .shape-item svg {
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .shape-name {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* 遊戲4：學習心得 */
+        .reflection-content {
+            background: rgba(255,255,255,0.95);
+            border-radius: 30px;
+            padding: 40px;
+            margin-top: 30px;
+            text-align: left;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .reflection-content p {
+            font-size: 1.2rem;
+            line-height: 2;
+            color: #333;
+            text-align: justify;
+        }
+
+        .reflection-content .highlight {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+
+        /* 訊息彈窗 */
+        .message-popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            z-index: 2000;
+            text-align: center;
+            animation: popIn 0.3s ease;
+        }
+
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .message-popup .emoji {
+            font-size: 4rem;
+            margin-bottom: 15px;
+        }
+
+        .message-popup .text {
+            font-size: 1.5rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1500;
+        }
+
+        /* 裝飾元素 */
+        .decoration {
+            position: fixed;
+            font-size: 2rem;
+            opacity: 0.6;
+            animation: float 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .dec1 { top: 10%; left: 5%; animation-delay: 0s; }
+        .dec2 { top: 20%; right: 5%; animation-delay: 0.5s; }
+        .dec3 { bottom: 20%; left: 10%; animation-delay: 1s; }
+        .dec4 { bottom: 10%; right: 10%; animation-delay: 1.5s; }
+
+        /* 響應式設計 */
+        @media (max-width: 600px) {
+            #main-menu h1 { font-size: 2rem; }
+            .menu-grid { grid-template-columns: 1fr; }
+            .menu-btn { font-size: 1.2rem; padding: 25px 15px; }
+            .color-item { width: 120px; height: 120px; }
+            .number-item { width: 80px; height: 80px; font-size: 2rem; }
+            .shape-item svg { width: 90px; height: 90px; }
+            .reflection-content { padding: 25px; }
+            .reflection-content p { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- 裝飾元素 -->
+    <div class="decoration dec1">⭐</div>
+    <div class="decoration dec2">🌈</div>
+    <div class="decoration dec3">🎈</div>
+    <div class="decoration dec4">🦋</div>
+
+    <!-- 訊息彈窗 -->
+    <div class="overlay" id="overlay"></div>
+    <div class="message-popup" id="messagePopup">
+        <div class="emoji" id="popupEmoji">🎉</div>
+        <div class="text" id="popupText">太棒了！</div>
+    </div>
+
+    <div class="container">
+        <!-- 主選單 -->
+        <div id="main-menu">
+            <h1>🎮 快樂學習遊戲 🎮</h1>
+            <div class="menu-grid">
+                <button class="menu-btn btn-game1" onclick="showPage('game1')">
+                    🎨 顏色寶寶
+                </button>
+                <button class="menu-btn btn-game2" onclick="showPage('game2')">
+                    🔢 數字王國
+                </button>
+                <button class="menu-btn btn-game3" onclick="showPage('game3')">
+                    🔷 形狀樂園
+                </button>
+                <button class="menu-btn btn-game4" onclick="showPage('game4')">
+                    📝 學習心得
+                </button>
+            </div>
+        </div>
+
+        <!-- 遊戲1：顏色學習 -->
+        <div class="game-page" id="game1">
+            <button class="back-btn" onclick="showPage('main')">⬅ 返回主選單</button>
+            <h2>🎨 顏色寶寶 🎨</h2>
+            <p style="color: white; font-size: 1.3rem;">點點看每個顏色，聽聽它的名字！</p>
+            <div class="color-game">
+                <div class="color-item" style="background: linear-gradient(135deg, #ff6b6b, #ee5a5a);" onclick="showColorMessage('紅色', '🔴')">
+                    <span class="emoji">🍎</span>
+                    紅色
+                </div>
+                <div class="color-item" style="background: linear-gradient(135deg, #feca57, #ff9f43);" onclick="showColorMessage('黃色', '🟡')">
+                    <span class="emoji">🍌</span>
+                    黃色
+                </div>
+                <div class="color-item" style="background: linear-gradient(135deg, #48dbfb, #0abde3);" onclick="showColorMessage('藍色', '🔵')">
+                    <span class="emoji">💧</span>
+                    藍色
+                </div>
+                <div class="color-item" style="background: linear-gradient(135deg, #1dd1a1, #10ac84);" onclick="showColorMessage('綠色', '🟢')">
+                    <span class="emoji">🌿</span>
+                    綠色
+                </div>
+                <div class="color-item" style="background: linear-gradient(135deg, #ff9ff3, #f368e0);" onclick="showColorMessage('粉紅色', '🩷')">
+                    <span class="emoji">🌸</span>
+                    粉紅色
+                </div>
+                <div class="color-item" style="background: linear-gradient(135deg, #ffa502, #e67e22);" onclick="showColorMessage('橘色', '🟠')">
+                    <span class="emoji">🍊</span>
+                    橘色
+                </div>
+            </div>
+        </div>
+
+        <!-- 遊戲2：數字學習 -->
+        <div class="game-page" id="game2">
+            <button class="back-btn" onclick="showPage('main')">⬅ 返回主選單</button>
+            <h2>🔢 數字王國 🔢</h2>
+            <p style="color: white; font-size: 1.3rem;">點點數字，學會數數！</p>
+            <div class="number-game">
+                <div class="number-item" onclick="showNumberMessage(1)">1</div>
+                <div class="number-item" onclick="showNumberMessage(2)">2</div>
+                <div class="number-item" onclick="showNumberMessage(3)">3</div>
+                <div class="number-item" onclick="showNumberMessage(4)">4</div>
+                <div class="number-item" onclick="showNumberMessage(5)">5</div>
+                <div class="number-item" onclick="showNumberMessage(6)">6</div>
+                <div class="number-item" onclick="showNumberMessage(7)">7</div>
+                <div class="number-item" onclick="showNumberMessage(8)">8</div>
+                <div class="number-item" onclick="showNumberMessage(9)">9</div>
+                <div class="number-item" onclick="showNumberMessage(10)">10</div>
+            </div>
+        </div>
+
+        <!-- 遊戲3：形狀學習 -->
+        <div class="game-page" id="game3">
+            <button class="back-btn" onclick="showPage('main')">⬅ 返回主選單</button>
+            <h2>🔷 形狀樂園 🔷</h2>
+            <p style="color: white; font-size: 1.3rem;">點點形狀，認識他們！</p>
+            <div class="shape-game">
+                <div class="shape-item" onclick="showShapeMessage('圓形')">
+                    <svg viewBox="0 0 100 100">
+                        <circle cx="50" cy="50" r="45" fill="#FF6B6B"/>
+                    </svg>
+                    <div class="shape-name">圓形</div>
+                </div>
+                <div class="shape-item" onclick="showShapeMessage('正方形')">
+                    <svg viewBox="0 0 100 100">
+                        <rect x="10" y="10" width="80" height="80" fill="#4ECDC4"/>
+                    </svg>
+                    <div class="shape-name">正方形</div>
+                </div>
+                <div class="shape-item" onclick="showShapeMessage('三角形')">
+                    <svg viewBox="0 0 100 100">
+                        <polygon points="50,10 90,90 10,90" fill="#FFE66D"/>
+                    </svg>
+                    <div class="shape-name">三角形</div>
+                </div>
+                <div class="shape-item" onclick="showShapeMessage('長方形')">
+                    <svg viewBox="0 0 100 100">
+                        <rect x="15" y="25" width="70" height="50" fill="#95E1D3"/>
+                    </svg>
+                    <div class="shape-name">長方形</div>
+                </div>
+                <div class="shape-item" onclick="showShapeMessage('星形')">
+                    <svg viewBox="0 0 100 100">
+                        <polygon points="50,5 61,35 95,35 68,57 79,90 50,70 21,90 32,57 5,35 39,35" fill="#F38181"/>
+                    </svg>
+                    <div class="shape-name">星形</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 遊戲4：學習心得 -->
+        <div class="game-page" id="game4">
+            <button class="back-btn" onclick="showPage('main')">⬅ 返回主選單</button>
+            <h2>📝 學習心得 📝</h2>
+            <div class="reflection-content">
+                <p>
+                    從零到一，我用 AI 解鎖了人生新成就！ 💻✨
+                </p>
+                <br>
+                <p>
+                    最近參加了 AI 課程，挑戰了一件過去想都沒想過的事——<span class="highlight">自製個人網站</span>！原本以為寫網頁是工程師的專利，對滿滿的程式碼充滿恐懼。但在老師專業又耐心的引導下，帶領我們把 AI 變成最強助教。
+                </p>
+                <br>
+                <p>
+                    雖然過程中卡關好幾次、邏輯轉得有點辛苦，但當看到自己親手設計的網頁成功上線的那一刻，內心真的是滿滿的激動！這趟學習雖然有難度，但隨之而來的<span class="highlight">「人生解鎖成就感」</span>完全無價！
+                </p>
+                <br>
+                <p>
+                    感謝老師的傾囊相授，讓我跨越了舒適圈。在 AI 時代，最棒的投資就是持續投資自己的腦袋！🧠❤️
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showPage(page) {
+            // 隱藏所有頁面
+            document.getElementById('main-menu').style.display = 'none';
+            document.querySelectorAll('.game-page').forEach(p => p.classList.remove('active'));
+
+            // 顯示對應頁面
+            if (page === 'main') {
+                document.getElementById('main-menu').style.display = 'block';
+            } else {
+                document.getElementById(page).classList.add('active');
+            }
+        }
+
+        function showMessage(emoji, text) {
+            document.getElementById('popupEmoji').textContent = emoji;
+            document.getElementById('popupText').textContent = text;
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('messagePopup').style.display = 'block';
+
+            setTimeout(() => {
+                document.getElementById('overlay').style.display = 'none';
+                document.getElementById('messagePopup').style.display = 'none';
+            }, 1500);
+        }
+
+        function showColorMessage(color, emoji) {
+            showMessage(emoji, `這是${color}！`);
+        }
+
+        function showNumberMessage(num) {
+            const emojis = ['0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'];
+            showMessage(emojis[num], `數字 ${num}！`);
+        }
+
+        function showShapeMessage(shape) {
+            showMessage('⭐', `這是${shape}！`);
+        }
+
+        // 點擊彈窗外部關閉
+        document.getElementById('overlay').addEventListener('click', () => {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('messagePopup').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
